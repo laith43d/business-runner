@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"strict": true,
+		"target": "ESNext",
+		"lib": ["ES2021", "ES2022.Object", "DOM"],
+		"types": ["node"],
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"moduleResolution": "Bundler",
+		"module": "ESNext",
+		"noEmit": true,
+		"isolatedModules": true
+	},
+	"include": ["./**/*"],
+	"exclude": ["./_generated"]
+}
