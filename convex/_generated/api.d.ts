@@ -9,6 +9,7 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as dashboard from "../dashboard.js";
 import type * as disbursements from "../disbursements.js";
 import type * as expenseCategories from "../expenseCategories.js";
 import type * as http from "../http.js";
@@ -26,6 +27,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  dashboard: typeof dashboard;
   disbursements: typeof disbursements;
   expenseCategories: typeof expenseCategories;
   http: typeof http;

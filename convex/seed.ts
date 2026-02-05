@@ -79,3 +79,95 @@ export const seedExpenseCategories = mutation({
 		return inserted;
 	},
 });
+
+/**
+ * Seed demo transactions for dashboard testing.
+ * Creates income and expense transactions across the last 6 months.
+ */
+export const seedDemoTransactions = mutation({
+	args: {},
+	returns: v.number(),
+	handler: async (ctx) => {
+		const userId = await getAuthUserId(ctx);
+		if (!userId) {
+			throw new ConvexError({
+				code: "UNAUTHENTICATED",
+				message: "يجب تسجيل الدخول",
+			});
+		}
+
+		// Check if we already have transactions
+		const existing = await ctx.db.query("transactions").take(1);
+		if (existing.length > 0) {
+			return 0; // already seeded
+		}
+
+		const now = new Date();
+		const categories = ["إيجار", "مرافق", "رواتب", "تسويق", "مستلزمات", "تشغيل", "متفرقات"];
+		const incomeDescriptions = [
+			"مبيعات منتجات",
+			"خدمات استشارية",
+			"اشتراكات شهرية",
+			"عقد صيانة",
+			"مبيعات إلكترونية",
+		];
+
+		const transactions: Array<{
+			type: "income" | "expense";
+			amount: number;
+			description: string;
+			date: number;
+			category?: string;
+			notes?: string;
+			createdBy: typeof userId;
+			createdAt: number;
+			updatedAt: number;
+		}> = [];
+
+		// Generate 6 months of data
+		for (let m = 5; m >= 0; m--) {
+			const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+
+			// 3-5 income transactions per month
+			const incomeCount = 3 + Math.floor(Math.random() * 3);
+			for (let i = 0; i < incomeCount; i++) {
+				const day = 1 + Math.floor(Math.random() * 27);
+				const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+				transactions.push({
+					type: "income",
+					amount: Math.round((2000 + Math.random() * 8000) * 100) / 100,
+					description: incomeDescriptions[Math.floor(Math.random() * incomeDescriptions.length)],
+					date: date.getTime(),
+					createdBy: userId,
+					createdAt: Date.now(),
+					updatedAt: Date.now(),
+				});
+			}
+
+			// 4-8 expense transactions per month
+			const expenseCount = 4 + Math.floor(Math.random() * 5);
+			for (let i = 0; i < expenseCount; i++) {
+				const day = 1 + Math.floor(Math.random() * 27);
+				const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+				const cat = categories[Math.floor(Math.random() * categories.length)];
+				transactions.push({
+					type: "expense",
+					amount: Math.round((500 + Math.random() * 4000) * 100) / 100,
+					description: `مصروف - ${cat}`,
+					date: date.getTime(),
+					category: cat,
+					createdBy: userId,
+					createdAt: Date.now(),
+					updatedAt: Date.now(),
+				});
+			}
+		}
+
+		// Insert all transactions
+		for (const t of transactions) {
+			await ctx.db.insert("transactions", t);
+		}
+
+		return transactions.length;
+	},
+});
