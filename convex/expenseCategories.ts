@@ -29,7 +29,7 @@ export const list = query({
 
 		const categories = await ctx.db
 			.query("expenseCategories")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		// Sort by name (Arabic alphabetical)
@@ -96,7 +96,7 @@ export const create = mutation({
 		// Check uniqueness among active categories (case-insensitive)
 		const existing = await ctx.db
 			.query("expenseCategories")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		const duplicate = existing.find(
@@ -160,7 +160,7 @@ export const update = mutation({
 			// Check uniqueness among other active categories
 			const existing = await ctx.db
 				.query("expenseCategories")
-				.filter((q) => q.eq(q.field("isActive"), true))
+				.withIndex("by_isActive", (q) => q.eq("isActive", true))
 				.collect();
 
 			const duplicate = existing.find(

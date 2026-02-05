@@ -35,7 +35,7 @@ const schema = defineSchema({
 		description: v.optional(v.string()),
 		isActive: v.boolean(),
 		createdAt: v.number(),
-	}),
+	}).index("by_isActive", ["isActive"]),
 
 	shareholders: defineTable({
 		name: v.string(),
@@ -44,7 +44,7 @@ const schema = defineSchema({
 		isActive: v.boolean(),
 		createdAt: v.number(),
 		updatedAt: v.number(),
-	}),
+	}).index("by_isActive", ["isActive"]),
 
 	disbursements: defineTable({
 		shareholderId: v.id("shareholders"),

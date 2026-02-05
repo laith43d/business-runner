@@ -38,7 +38,7 @@
 			<p class="text-muted-foreground">لا يوجد شركاء نشطين لتوزيع الأرباح</p>
 		</div>
 	{:else}
-		<div class="rounded-md border">
+		<div class="overflow-x-auto rounded-md border">
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>

@@ -110,7 +110,7 @@ export const create = mutation({
 			// Verify category exists and is active
 			const categories = await ctx.db
 				.query("expenseCategories")
-				.filter((q) => q.eq(q.field("isActive"), true))
+				.withIndex("by_isActive", (q) => q.eq("isActive", true))
 				.collect();
 
 			const validCategory = categories.find(
@@ -215,7 +215,7 @@ export const update = mutation({
 
 				const categories = await ctx.db
 					.query("expenseCategories")
-					.filter((q) => q.eq(q.field("isActive"), true))
+					.withIndex("by_isActive", (q) => q.eq("isActive", true))
 					.collect();
 
 				const validCategory = categories.find(
@@ -242,6 +242,68 @@ export const update = mutation({
 		}
 
 		return null;
+	},
+});
+
+/**
+ * List all transactions for CSV export (no pagination limit).
+ * Returns formatted fields ready for export with Arabic column names.
+ */
+export const listForExport = query({
+	args: {
+		type: v.union(v.literal("income"), v.literal("expense")),
+		dateFrom: v.optional(v.number()),
+		dateTo: v.optional(v.number()),
+		category: v.optional(v.string()),
+	},
+	handler: async (ctx, args) => {
+		const userId = await getAuthUserId(ctx);
+		if (!userId) {
+			throw new ConvexError({
+				code: "UNAUTHENTICATED",
+				message: "يجب تسجيل الدخول",
+			});
+		}
+
+		let q = ctx.db
+			.query("transactions")
+			.withIndex("by_type_and_date", (idx) => {
+				const byType = idx.eq("type", args.type);
+				if (args.dateFrom !== undefined && args.dateTo !== undefined) {
+					return byType.gte("date", args.dateFrom).lte("date", args.dateTo);
+				} else if (args.dateFrom !== undefined) {
+					return byType.gte("date", args.dateFrom);
+				} else if (args.dateTo !== undefined) {
+					return byType.lte("date", args.dateTo);
+				}
+				return byType;
+			})
+			.order("desc");
+
+		// Apply category filter
+		if (args.category) {
+			const cat = args.category;
+			q = q.filter((f) => f.eq(f.field("category"), cat));
+		}
+
+		const results = await q.collect();
+
+		// Format for export with Arabic headers
+		const typeLabel = args.type === "income" ? "إيراد" : "مصروف";
+
+		return results.map((t) => {
+			const date = new Date(t.date);
+			const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+			return {
+				التاريخ: dateStr,
+				النوع: typeLabel,
+				المبلغ: t.amount,
+				التصنيف: t.category ?? "—",
+				الوصف: t.description,
+				ملاحظات: t.notes ?? "",
+			};
+		});
 	},
 });
 

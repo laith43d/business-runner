@@ -51,11 +51,11 @@
 
 {#if categories.length === 0}
 	<div class="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-		<p class="text-lg font-medium text-muted-foreground">لا توجد تصنيفات</p>
-		<p class="mt-1 text-sm text-muted-foreground">أضف أول تصنيف للمصروفات</p>
+		<p class="text-lg font-medium text-muted-foreground">لم يتم إضافة أي تصنيفات بعد</p>
+		<p class="mt-1 text-sm text-muted-foreground">أضف أول تصنيف للمصروفات لتنظيم نفقاتك</p>
 	</div>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-md border">
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>

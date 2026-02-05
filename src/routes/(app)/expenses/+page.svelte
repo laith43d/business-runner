@@ -8,11 +8,12 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { toast } from 'svelte-sonner';
-	import { Plus, Search } from 'lucide-svelte';
+	import { Plus, Search, Download, Loader2 } from 'lucide-svelte';
 	import TransactionForm from '$lib/components/transactions/TransactionForm.svelte';
 	import TransactionList from '$lib/components/transactions/TransactionList.svelte';
 	import EditTransactionDialog from '$lib/components/transactions/EditTransactionDialog.svelte';
 	import DateRangeFilter from '$lib/components/filters/DateRangeFilter.svelte';
+	import { exportToCSV } from '$lib/utils/export.js';
 
 	type Transaction = {
 		_id: Id<'transactions'>;
@@ -108,6 +109,38 @@
 	function handleCategoryFilterChange(value: string) {
 		categoryFilter = value === '__all__' ? '' : value;
 	}
+
+	// CSV Export
+	let isExporting = $state(false);
+
+	async function handleExport() {
+		isExporting = true;
+		try {
+			const exportArgs: {
+				type: 'expense';
+				dateFrom?: number;
+				dateTo?: number;
+				category?: string;
+			} = { type: 'expense' as const };
+
+			if (dateFrom !== undefined) exportArgs.dateFrom = dateFrom;
+			if (dateTo !== undefined) exportArgs.dateTo = dateTo;
+			if (categoryFilter) exportArgs.category = categoryFilter;
+
+			const data = await client.query(api.transactions.listForExport, exportArgs);
+			if (data.length === 0) {
+				toast.info('لا توجد مصروفات للتصدير');
+				return;
+			}
+			exportToCSV(data, `مصروفات-${new Date().toISOString().slice(0, 10)}.csv`);
+			toast.success(`تم تصدير ${data.length} مصروف بنجاح`);
+		} catch (err: any) {
+			const message = err?.data?.message || 'حدث خطأ أثناء التصدير';
+			toast.error(message);
+		} finally {
+			isExporting = false;
+		}
+	}
 </script>
 
 <div class="space-y-6">
@@ -119,10 +152,20 @@
 				إدارة وتتبع جميع مصروفات عملك مصنفة حسب الفئات.
 			</p>
 		</div>
-		<Button onclick={() => (createDialogOpen = true)}>
-			<Plus class="h-4 w-4" />
-			إضافة مصروف
-		</Button>
+		<div class="flex items-center gap-2">
+			<Button variant="outline" onclick={handleExport} disabled={isExporting || (transactions.data?.length === 0)}>
+				{#if isExporting}
+					<Loader2 class="h-4 w-4 animate-spin" />
+				{:else}
+					<Download class="h-4 w-4" />
+				{/if}
+				تصدير CSV
+			</Button>
+			<Button onclick={() => (createDialogOpen = true)}>
+				<Plus class="h-4 w-4" />
+				إضافة مصروف
+			</Button>
+		</div>
 	</div>
 
 	<!-- Filters -->

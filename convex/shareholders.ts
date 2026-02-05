@@ -31,7 +31,7 @@ export const list = query({
 
 		const shareholders = await ctx.db
 			.query("shareholders")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		return shareholders.sort((a, b) => a.name.localeCompare(b.name, "ar"));
@@ -123,7 +123,7 @@ export const getTotalPercentage = query({
 
 		const activeShareholders = await ctx.db
 			.query("shareholders")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		const total = activeShareholders.reduce(
@@ -187,7 +187,7 @@ export const create = mutation({
 		// Check total doesn't exceed 100%
 		const activeShareholders = await ctx.db
 			.query("shareholders")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		const currentTotal = activeShareholders.reduce(
@@ -280,7 +280,7 @@ export const update = mutation({
 			// Check total excluding this shareholder's old percentage
 			const activeShareholders = await ctx.db
 				.query("shareholders")
-				.filter((q) => q.eq(q.field("isActive"), true))
+				.withIndex("by_isActive", (q) => q.eq("isActive", true))
 				.collect();
 
 			const totalExcludingSelf = activeShareholders

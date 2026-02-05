@@ -16,7 +16,7 @@
 
 <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-blur:bg-background/60 lg:px-6">
 	<div class="flex items-center gap-3">
-		<button class="lg:hidden" onclick={onToggleSidebar}>
+		<button class="lg:hidden" onclick={onToggleSidebar} aria-label="فتح القائمة الجانبية">
 			<Menu class="h-6 w-6" />
 		</button>
 		<h2 class="text-lg font-semibold lg:hidden">متتبع المصروفات</h2>

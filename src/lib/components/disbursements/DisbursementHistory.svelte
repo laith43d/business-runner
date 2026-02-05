@@ -90,7 +90,7 @@
 				</Select.Trigger>
 				<Select.Content>
 					<Select.Item value="all">الكل</Select.Item>
-					{#each shareholders as sh}
+					{#each shareholders as sh (sh.id)}
 						<Select.Item value={sh.id}>{sh.name}</Select.Item>
 					{/each}
 				</Select.Content>
@@ -110,7 +110,7 @@
 			<p class="text-muted-foreground">لا توجد توزيعات مسجلة لهذه الفترة</p>
 		</div>
 	{:else}
-		<div class="rounded-md border">
+		<div class="overflow-x-auto rounded-md border">
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>

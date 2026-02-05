@@ -149,7 +149,7 @@ export const getShareholderShares = query({
 		// Get active shareholders
 		const shareholders = await ctx.db
 			.query("shareholders")
-			.filter((q) => q.eq(q.field("isActive"), true))
+			.withIndex("by_isActive", (q) => q.eq("isActive", true))
 			.collect();
 
 		// Get all disbursements in the period

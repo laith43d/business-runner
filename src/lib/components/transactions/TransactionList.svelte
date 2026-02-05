@@ -66,14 +66,14 @@
 		class="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center"
 	>
 		<p class="text-lg font-medium text-muted-foreground">
-			{type === 'income' ? 'لا توجد إيرادات' : 'لا توجد مصروفات'}
+			{type === 'income' ? 'لم يتم تسجيل أي إيرادات بعد' : 'لم يتم تسجيل أي مصروفات بعد'}
 		</p>
 		<p class="mt-1 text-sm text-muted-foreground">
 			{type === 'income' ? 'أضف أول إيراد لتتبع دخلك' : 'أضف أول مصروف لتتبع نفقاتك'}
 		</p>
 	</div>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-md border">
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>

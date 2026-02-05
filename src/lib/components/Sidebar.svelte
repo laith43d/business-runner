@@ -49,14 +49,14 @@
 	<!-- Sidebar header -->
 	<div class="flex h-16 items-center justify-between border-b px-6">
 		<h1 class="text-lg font-bold">متتبع المصروفات</h1>
-		<button class="lg:hidden" onclick={() => (open = false)}>
+		<button class="lg:hidden" onclick={() => (open = false)} aria-label="إغلاق القائمة الجانبية">
 			<X class="h-5 w-5" />
 		</button>
 	</div>
 
 	<!-- Navigation -->
-	<nav class="flex-1 space-y-1 px-3 py-4">
-		{#each links as link}
+	<nav class="flex-1 space-y-1 px-3 py-4" aria-label="القائمة الرئيسية">
+		{#each links as link (link.href)}
 			{@const active = isActive(link.href)}
 			<a
 				href={link.href}

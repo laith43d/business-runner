@@ -123,8 +123,8 @@
 		</div>
 	{:else}
 		<div class="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-			<p class="text-lg font-medium text-muted-foreground">لا يوجد شركاء</p>
-			<p class="mt-1 text-sm text-muted-foreground">أضف أول شريك للبدء</p>
+			<p class="text-lg font-medium text-muted-foreground">لم يتم إضافة أي شركاء بعد</p>
+			<p class="mt-1 text-sm text-muted-foreground">أضف أول شريك لبدء توزيع الأرباح</p>
 		</div>
 	{/if}
 </div>
