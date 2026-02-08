@@ -83,6 +83,7 @@
 	function handleDistribute(share: ShareholderShare) {
 		disbShareholderId = share.shareholderId;
 		disbShareholderName = share.shareholderName;
+		// Pass actual remaining (can be negative for debt), dialog handles display
 		disbMaxAmount = share.remaining;
 		disbDialogOpen = true;
 	}

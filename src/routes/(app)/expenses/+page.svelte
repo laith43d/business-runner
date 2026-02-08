@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useQuery, useConvexClient } from 'convex-svelte';
 	import { api } from '../../../../convex/_generated/api.js';
-	import type { Id } from '../../../../convex/_generated/dataModel.js';
+	import type { Id, Doc } from '../../../../convex/_generated/dataModel.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -15,19 +15,7 @@
 	import DateRangeFilter from '$lib/components/filters/DateRangeFilter.svelte';
 	import { exportToCSV } from '$lib/utils/export.js';
 
-	type Transaction = {
-		_id: Id<'transactions'>;
-		_creationTime: number;
-		type: 'income' | 'expense';
-		amount: number;
-		category?: string;
-		description: string;
-		date: number;
-		notes?: string;
-		createdBy: Id<'users'>;
-		createdAt: number;
-		updatedAt: number;
-	};
+	type Transaction = Doc<'transactions'>;
 
 	// Filter state
 	let dateFrom = $state<number | undefined>(undefined);

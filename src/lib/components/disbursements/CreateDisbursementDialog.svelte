@@ -10,6 +10,7 @@
 	import { toast } from 'svelte-sonner';
 	import { formatCurrency } from '$lib/utils/format.js';
 	import { timestampToDateString } from '$lib/utils/format.js';
+	import { AlertTriangle } from 'lucide-svelte';
 
 	type Props = {
 		open: boolean;
@@ -30,6 +31,12 @@
 
 	let amountError = $state('');
 	let dateError = $state('');
+
+	// Derived: is the entered amount creating debt?
+	let createsDebt = $derived.by(() => {
+		const amt = Number(amount);
+		return amount !== '' && !isNaN(amt) && amt > 0 && amt > maxAmount;
+	});
 
 	const client = useConvexClient();
 
@@ -55,9 +62,6 @@
 			valid = false;
 		} else if (amt <= 0) {
 			amountError = 'المبلغ يجب أن يكون أكبر من صفر';
-			valid = false;
-		} else if (amt > maxAmount) {
-			amountError = `المبلغ يتجاوز المتبقي (${formatCurrency(maxAmount)})`;
 			valid = false;
 		}
 
@@ -127,15 +131,32 @@
 					type="number"
 					dir="ltr"
 					min="0.01"
-					max={maxAmount}
 					step="0.01"
 					bind:value={amount}
 					placeholder="0.00"
-					class={amountError ? 'border-destructive' : ''}
+					class={amountError ? 'border-destructive' : createsDebt ? 'border-yellow-500' : ''}
 				/>
-				<p class="text-sm text-muted-foreground">
-					الحد الأقصى: {formatCurrency(maxAmount)}
-				</p>
+				{#if maxAmount > 0}
+					<p class="text-sm text-muted-foreground">
+						المتبقي من الحصة: {formatCurrency(maxAmount)}
+					</p>
+				{:else if maxAmount === 0}
+					<p class="text-sm text-muted-foreground">
+						تم توزيع كامل الحصة — أي مبلغ سينشئ ديناً
+					</p>
+				{:else}
+					<p class="text-sm text-red-600">
+						الشريك مدين بمبلغ {formatCurrency(Math.abs(maxAmount))} — أي مبلغ سيزيد الدين
+					</p>
+				{/if}
+				{#if createsDebt}
+					<div class="flex items-center gap-2 rounded-md border border-yellow-500/50 bg-yellow-50 p-2 dark:bg-yellow-950/20">
+						<AlertTriangle class="h-4 w-4 shrink-0 text-yellow-600" />
+						<p class="text-sm text-yellow-700 dark:text-yellow-400">
+							تحذير: المبلغ يتجاوز الحصة المستحقة بـ {formatCurrency(Number(amount) - Math.max(0, maxAmount))}. سيتم تسجيل دين على الشريك.
+						</p>
+					</div>
+				{/if}
 				{#if amountError}
 					<p class="text-sm text-destructive">{amountError}</p>
 				{/if}

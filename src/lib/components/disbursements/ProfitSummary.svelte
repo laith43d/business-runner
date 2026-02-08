@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { formatCurrency } from '$lib/utils/format.js';
-	import { TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-svelte';
+	import { TrendingUp, TrendingDown, DollarSign, Wallet, AlertTriangle } from 'lucide-svelte';
 
 	type Props = {
 		totalIncome: number;
@@ -65,11 +65,21 @@
 			</Card.Content>
 		</Card.Root>
 
-		<!-- Available Profit -->
-		<Card.Root>
+		<!-- Available Profit / Debt -->
+		<Card.Root class={availableProfit < 0 ? 'border-red-200 dark:border-red-900/50' : ''}>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">الأرباح المتاحة للتوزيع</Card.Title>
-				<Wallet class="h-4 w-4 text-primary" />
+				<Card.Title class="text-sm font-medium">
+					{#if availableProfit < 0}
+						إجمالي الديون
+					{:else}
+						الأرباح المتاحة للتوزيع
+					{/if}
+				</Card.Title>
+				{#if availableProfit < 0}
+					<AlertTriangle class="h-4 w-4 text-red-500" />
+				{:else}
+					<Wallet class="h-4 w-4 text-primary" />
+				{/if}
 			</Card.Header>
 			<Card.Content>
 				<p class="text-2xl font-bold {availableProfit >= 0 ? 'text-primary' : 'text-red-600'}">
@@ -78,6 +88,11 @@
 				{#if totalDisbursements > 0}
 					<p class="mt-1 text-xs text-muted-foreground">
 						تم توزيع {formatCurrency(totalDisbursements)}
+					</p>
+				{/if}
+				{#if availableProfit < 0}
+					<p class="mt-1 text-xs text-red-600">
+						تم التوزيع الزائد عن الأرباح
 					</p>
 				{/if}
 			</Card.Content>

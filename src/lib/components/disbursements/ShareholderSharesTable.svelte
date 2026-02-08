@@ -50,23 +50,29 @@
 						<Table.Head class="w-[120px] text-right">الإجراءات</Table.Head>
 					</Table.Row>
 				</Table.Header>
-				<Table.Body>
-					{#each shares as share (share.shareholderId)}
-						<Table.Row class={share.remaining <= 0 ? 'opacity-50' : ''}>
+			<Table.Body>
+				{#each shares as share (share.shareholderId)}
+						<Table.Row>
 							<Table.Cell class="font-medium">{share.shareholderName}</Table.Cell>
 							<Table.Cell>{share.sharePercentage}%</Table.Cell>
 							<Table.Cell>{formatCurrency(share.shareAmount)}</Table.Cell>
 							<Table.Cell class="text-muted-foreground">
 								{formatCurrency(share.disbursed)}
 							</Table.Cell>
-							<Table.Cell class="font-semibold {share.remaining > 0 ? 'text-green-600' : 'text-muted-foreground'}">
-								{formatCurrency(share.remaining)}
+							<Table.Cell class="font-semibold {share.remaining > 0 ? 'text-green-600' : share.remaining < 0 ? 'text-red-600' : 'text-muted-foreground'}">
+								{#if share.remaining < 0}
+									<span class="flex items-center gap-1">
+										{formatCurrency(share.remaining)}
+										<span class="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-950/50 dark:text-red-400">مدين</span>
+									</span>
+								{:else}
+									{formatCurrency(share.remaining)}
+								{/if}
 							</Table.Cell>
 							<Table.Cell>
 								<Button
 									variant="outline"
 									size="sm"
-									disabled={share.remaining <= 0}
 									onclick={() => onDistribute(share)}
 								>
 									<Banknote class="h-4 w-4" />
